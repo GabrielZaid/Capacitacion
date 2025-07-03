@@ -34,15 +34,18 @@ export default async function listPokemon() {
         throw new Error("No se pudo obtener la información del Pokémon.");
     }
 
-    console.log("Pokemon caracteristicas:");
-    console.log("Nombre:", data.name);
-    console.log("Altura:", data.height);
-    console.log("Peso:", data.weight);
-    console.log("Habilidades:", data.abilities.map(ability => ability.ability.name).join(", "));
-    console.log("Tipos:", data.types.map(type => type.type.name).join(", "));
-    console.log("Experiencia Base:", data.base_experience);
-    console.log("Sprites:", data.sprites.front_default);
-    console.log("Movimientos:", data.moves.map(move => move.move.name).join(", "));
+    // console.log("Pokemon caracteristicas:");
+    // console.log("Nombre:", data.name);
+    // console.log("Altura:", data.height);
+    // console.log("Peso:", data.weight);
+    // console.log("Habilidades:", data.abilities.map(ability => ability.ability.name).join(", "));
+    // console.log("Tipos:", data.types.map(type => type.type.name).join(", "));
+    // console.log("Experiencia Base:", data.base_experience);
+    // console.log("Sprites:", data.sprites.front_default);
+    // console.log("Movimientos:", data.moves.map(move => move.move.name).join(", "));
+
+    console.log(data)
+
 }
 
 // Call the function
