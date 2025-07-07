@@ -1,9 +1,10 @@
 /**
  * clase controller
- * Este controlador solo maneja las peticiones HTTP y delega la lógica de negocio al Service
+ * Este controlador maneja las peticiones HTTP y delega la lógica de negocio al Service
  */
 
 import { factories } from '@strapi/strapi';
+import { sanitize, validate } from '@strapi/utils';
 
 interface AsignarProfesorRequest {
   nombreClase: string;
@@ -13,15 +14,28 @@ interface AsignarProfesorRequest {
 export default factories.createCoreController('api::clase.clase', ({ strapi }) => ({
 
   /**
-   * POST /api/clases/asignar-profesor
+   * POST /api/clases/asignar-profesor-by-clase
    * Controller que maneja la petición HTTP y delega al Service
    */
   async asignarProfesorByClase(ctx) {
     try {
+      // Validar y sanitizar la entrada
+      const contentType = strapi.contentType('api::clase.clase');
+      
       // Extraer parámetros de la petición
       const { nombreClase, profesorId } = ctx.request.body as AsignarProfesorRequest;
-    
       
+      // Validación básica de entrada
+      if (!nombreClase || !profesorId) {
+        ctx.status = 400;
+        ctx.body = {
+          success: false,
+          message: 'Se requieren los campos nombreClase y profesorId',
+          data: null
+        };
+        return;
+      }
+
       // Llamar al service con la lógica de negocio
       const serviceResponse = await strapi.service('api::clase.clase').asignarProfesor(nombreClase, profesorId);
       
@@ -46,8 +60,16 @@ export default factories.createCoreController('api::clase.clase', ({ strapi }) =
           return;
           
         case 404:
-          console.log('Clase no encontrada:', serviceResponse.message);
           ctx.status = 404;
+          ctx.body = {
+            success: serviceResponse.success,
+            message: serviceResponse.message,
+            data: serviceResponse.data
+          };
+          return;
+          
+        case 409:
+          ctx.status = 409;
           ctx.body = {
             success: serviceResponse.success,
             message: serviceResponse.message,
@@ -79,6 +101,5 @@ export default factories.createCoreController('api::clase.clase', ({ strapi }) =
       return;
     }
   },
-
 
 }));

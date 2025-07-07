@@ -146,7 +146,7 @@ GET http://localhost:1337/api/profesor-eventos/by-name?nombreProfesor=Leonel And
 
 # API 2: Asignar profesor a clase
 
-POST http://localhost:1337/api/clases/asignar-profesor
+POST http://localhost:1337/api/clases/asignar-profesor-by-clase
 Content-Type: application/json
 {
   "nombreClase": "Clase IA",
