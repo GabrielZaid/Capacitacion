@@ -1,0 +1,80 @@
+{
+  "kind": "collectionType",
+  "collectionName": "platoes",
+  "info": {
+    "singularName": "plato",
+    "pluralName": "platoes",
+    "displayName": "plato"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "Foto": {
+      "type": "media",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "multiple": true,
+      "required": true,
+      "allowedTypes": [
+        "images",
+        "files"
+      ]
+    },
+    "Nombre": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "minLength": 2,
+      "maxLength": 255,
+      "required": true,
+      "unique": true
+    },
+    "Precio": {
+      "type": "decimal",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true,
+      "default": 0,
+      "max": 255
+    },
+    "Alergeno": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "detalles.alergeno",
+      "repeatable": true
+    },
+    "Tipo": {
+      "type": "enumeration",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true,
+      "enum": [
+        "Primero",
+        "Segundo",
+        "Postre"
+      ]
+    }
+  }
+}
