@@ -1,0 +1,65 @@
+{
+  "kind": "collectionType",
+  "collectionName": "clases",
+  "info": {
+    "singularName": "clase",
+    "pluralName": "clases",
+    "displayName": "Clase"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "titulo": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "maxLength": 255,
+      "required": true,
+      "unique": true
+    },
+    "descripcion": {
+      "type": "text",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "default": "N/R",
+      "maxLength": 255
+    },
+    "fecha_inicio": {
+      "type": "datetime",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
+    },
+    "profesors": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::profesor.profesor",
+      "inversedBy": "clases"
+    },
+    "detalles": {
+      "type": "component",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "clase.detalles-clase",
+      "repeatable": true
+    }
+  }
+}

@@ -1,0 +1,154 @@
+#  Forma de extraer todos los profesores
+GET http://localhost:1337/api/profesors
+
+#  Forma de extraer un profesor en concreto usando documentId (Strapi v5)
+GET http://localhost:1337/api/profesors/v956se3xlo4dh2ybsjiiw2gf
+
+#  Ejemplos con otros profesores:
+# GET http://localhost:1337/api/profesors/un4u38c26n23eok59zv8okye
+# GET http://localhost:1337/api/profesors/jyezcdtkoh9s64lufnvwajti
+
+### BÚSQUEDA POR NOMBRE ###
+
+#  Buscar profesor por nombre exacto
+GET http://localhost:1337/api/profesors?filters[nombre][$eq]=Leonel Andres
+
+#  Buscar profesor por nombre que contenga una palabra (case insensitive)
+GET http://localhost:1337/api/profesors?filters[nombre][$containsi]=leonel
+
+#  Buscar profesor por nombre que empiece con cierta letra
+GET http://localhost:1337/api/profesors?filters[nombre][$startsWith]=L
+
+#  Buscar profesor por apellido
+GET http://localhost:1337/api/profesors?filters[apellido][$eq]=Messi
+
+#  Buscar profesor por nombre O apellido (usando OR)
+GET http://localhost:1337/api/profesors?filters[$or][0][nombre][$containsi]=leonel&filters[$or][1][apellido][$containsi]=messi
+
+#  Buscar profesor por nombre Y apellido (usando AND)
+GET http://localhost:1337/api/profesors?filters[nombre][$containsi]=leonel&filters[apellido][$containsi]=messi
+
+#  Buscar profesor por correo electrónico
+GET http://localhost:1337/api/profesors?filters[correo_electronico][$eq]=messi@example.com
+
+
+# Traemos todo los eventos:
+GET http://localhost:1337/api/eventos
+
+# Buscamos los eventos que contengan un nombre concreto
+GET http://localhost:1337/api/eventos?filters[nombre][$contains]=nombre_del_evento
+
+# Practicamente los mismos métodos de búsqueda que los profesores, pero aplicados a eventos: para buscalor por diferentes campos.
+
+### FILTROS POR RELACIONES ###
+
+# Buscamos los profesores que contengan un evento en concreto por documentId
+GET http://localhost:1337/api/profesors?filters[eventos][documentId][$eq]=n1uxqkjn8sdnbbo00v8zn5jx
+
+# Buscamos los profesores que contengan un evento por título del evento
+GET http://localhost:1337/api/profesors?filters[eventos][title][$containsi]=nombre_del_evento
+
+# Traer profesores con información de sus eventos (populate)
+GET http://localhost:1337/api/profesors?populate[eventos]=*
+
+# Traer un profesor específico con sus eventos
+GET http://localhost:1337/api/profesors/v956se3xlo4dh2ybsjiiw2gf?populate[eventos]=*
+
+# Filtrar profesores que tienen al menos un evento
+GET http://localhost:1337/api/profesors?filters[eventos][$notNull]=true
+
+# Filtrar profesores que NO tienen eventos
+GET http://localhost:1337/api/profesors?filters[eventos][$null]=true
+
+
+# Haz una llamada a la API que saque los eventos de una fecha en concreto
+# La fecha está dentro del componente "detalles", por eso usamos detalles.fecha
+GET http://localhost:1337/api/eventos?filters[detalles][fecha][$eq]=2025-07-07
+
+# Ejemplos adicionales para filtrar por fecha:
+# Eventos de una fecha específica con populate
+GET http://localhost:1337/api/eventos?filters[detalles][fecha][$eq]=2025-07-07&populate=*
+
+# Eventos de un rango de fechas (desde una fecha)
+GET http://localhost:1337/api/eventos?filters[detalles][fecha][$gte]=2025-07-07
+
+# Eventos de un rango de fechas (hasta una fecha)
+GET http://localhost:1337/api/eventos?filters[detalles][fecha][$lte]=2025-07-07
+
+# Eventos entre dos fechas
+GET http://localhost:1337/api/eventos?filters[detalles][fecha][$gte]=2025-07-01&filters[detalles][fecha][$lte]=2025-07-31
+
+# Eventos por hora de inicio
+GET http://localhost:1337/api/eventos?filters[detalles][hora_inicio][$eq]=12:30:00.000
+
+# Eventos por lugar
+GET http://localhost:1337/api/eventos?filters[detalles][lugar][$containsi]=en linea
+
+# Haz una llamada a la API que saque la zona dinamica de eventos
+# Forma alternativa más simple - poblar toda la zona dinámica
+GET http://localhost:1337/api/eventos?populate=zonaDinamica
+
+# Para obtener eventos que tienen contenido en la zona dinámica
+GET http://localhost:1337/api/eventos?filters[zonaDinamica][$notNull]=true&populate=zonaDinamica
+
+# Para obtener eventos sin contenido en la zona dinámica
+GET http://localhost:1337/api/eventos?filters[zonaDinamica][$null]=true
+
+# Poblar todos los campos de eventos (incluyendo zona dinámica)
+GET http://localhost:1337/api/eventos?populate=*
+
+# Saca toda la informacion de las clases.
+GET http://localhost:1337/api/clases?populate=*
+
+### CREAR CONTENIDO VIA API ###
+
+# Crear un nuevo profesor
+POST http://localhost:1337/api/profesors
+Content-Type: application/json
+
+{
+  "data": {
+    "nombre": "Nuevo Profesor",
+    "apellido": "Apellido Test",
+    "correo_electronico": "nuevo@example.com",
+    "telefono": "1234567890"
+  }
+}
+
+###
+
+# Crear un nuevo evento
+POST http://localhost:1337/api/eventos
+Content-Type: application/json
+
+{
+  "data": {
+    "title": "Nuevo Evento",
+    "descripcion": "Descripción del nuevo evento",
+    "detalles": {
+      "fecha": "2025-07-10",
+      "hora_inicio": "10:00:00.000",
+      "hora_final": "11:00:00.000",
+      "lugar": "Aula 101"
+    }
+  }
+}
+
+###
+
+### APIS PERSONALIZADAS ###
+
+# API 1: Obtener eventos por nombre de profesor (usando query parameters)
+GET http://localhost:1337/api/profesor-eventos/by-name?nombreProfesor=Leonel Andres
+
+
+
+
+# API 2: Asignar profesor a clase
+
+POST http://localhost:1337/api/clases/asignar-profesor
+Content-Type: application/json
+{
+  "nombreClase": "Clase IA",
+  "profesorId": "2"
+}

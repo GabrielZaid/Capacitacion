@@ -1,0 +1,31 @@
+{
+  "collectionName": "components_profesor_detalle_profesors",
+  "info": {
+    "displayName": "detalle_profesor"
+  },
+  "options": {},
+  "attributes": {
+    "especialidad": {
+      "type": "string",
+      "default": "N/R",
+      "minLength": 2,
+      "maxLength": 255,
+      "required": true,
+      "unique": true
+    },
+    "experiencia": {
+      "type": "text",
+      "default": "N/R",
+      "minLength": 2,
+      "maxLength": 255,
+      "required": true
+    },
+    "domicilio": {
+      "type": "string"
+    },
+    "pais_recidencia": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

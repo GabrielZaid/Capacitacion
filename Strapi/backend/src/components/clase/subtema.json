@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_clase_subtemas",
+  "info": {
+    "displayName": "subtema"
+  },
+  "options": {},
+  "attributes": {
+    "nombre_subtema": {
+      "type": "string",
+      "default": "N/R",
+      "minLength": 2,
+      "maxLength": 255,
+      "required": true
+    },
+    "descripcion": {
+      "type": "text",
+      "default": "N/R"
+    }
+  },
+  "config": {}
+}

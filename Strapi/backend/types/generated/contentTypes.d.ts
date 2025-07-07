@@ -506,6 +506,120 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiClaseClase extends Struct.CollectionTypeSchema {
+  collectionName: 'clases';
+  info: {
+    displayName: 'Clase';
+    pluralName: 'clases';
+    singularName: 'clase';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  pluginOptions: {
+    i18n: {
+      localized: true;
+    };
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    descripcion: Schema.Attribute.Text &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }> &
+      Schema.Attribute.DefaultTo<'N/R'>;
+    detalles: Schema.Attribute.Component<'clase.detalles-clase', true> &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    fecha_inicio: Schema.Attribute.DateTime &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::clase.clase'>;
+    profesors: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::profesor.profesor'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    titulo: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiEventoEvento extends Struct.CollectionTypeSchema {
+  collectionName: 'eventos';
+  info: {
+    displayName: 'Evento';
+    pluralName: 'eventos';
+    singularName: 'evento';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    descripcion: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
+    detalles: Schema.Attribute.Component<'evento.detalles-eventos', false>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::evento.evento'
+    > &
+      Schema.Attribute.Private;
+    material: Schema.Attribute.Component<'evento.material', true>;
+    profesors: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::profesor.profesor'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    tema: Schema.Attribute.Component<'clase.tema', true>;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }> &
+      Schema.Attribute.DefaultTo<'N/R'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    zonaDinamica: Schema.Attribute.DynamicZone<
+      ['ejercicio5.rich-text', 'ejercicio5.media', 'ejercicio5.enlace']
+    >;
+  };
+}
+
 export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
   collectionName: 'globals';
   info: {
@@ -532,6 +646,93 @@ export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
     publishedAt: Schema.Attribute.DateTime;
     siteDescription: Schema.Attribute.Text & Schema.Attribute.Required;
     siteName: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiProfesorEventoProfesorEvento
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'profesor_eventos';
+  info: {
+    displayName: 'Profesor Evento';
+    pluralName: 'profesor-eventos';
+    singularName: 'profesor-evento';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::profesor-evento.profesor-evento'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiProfesorProfesor extends Struct.CollectionTypeSchema {
+  collectionName: 'profesors';
+  info: {
+    displayName: 'Profesor';
+    pluralName: 'profesors';
+    singularName: 'profesor';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    apellido: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+        minLength: 2;
+      }> &
+      Schema.Attribute.DefaultTo<'N/R'>;
+    clases: Schema.Attribute.Relation<'manyToMany', 'api::clase.clase'>;
+    correo_electronico: Schema.Attribute.Email &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+        minLength: 11;
+      }> &
+      Schema.Attribute.DefaultTo<'nr@example.com'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    detalles: Schema.Attribute.Component<'profesor.detalle-profesor', false>;
+    eventos: Schema.Attribute.Relation<'manyToMany', 'api::evento.evento'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::profesor.profesor'
+    > &
+      Schema.Attribute.Private;
+    nombre: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+        minLength: 2;
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
+    telefono: Schema.Attribute.BigInteger &
+      Schema.Attribute.Unique &
+      Schema.Attribute.SetMinMax<
+        {
+          max: '35';
+          min: '10';
+        },
+        string
+      >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1051,7 +1252,11 @@ declare module '@strapi/strapi' {
       'api::article.article': ApiArticleArticle;
       'api::author.author': ApiAuthorAuthor;
       'api::category.category': ApiCategoryCategory;
+      'api::clase.clase': ApiClaseClase;
+      'api::evento.evento': ApiEventoEvento;
       'api::global.global': ApiGlobalGlobal;
+      'api::profesor-evento.profesor-evento': ApiProfesorEventoProfesorEvento;
+      'api::profesor.profesor': ApiProfesorProfesor;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

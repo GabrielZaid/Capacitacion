@@ -1,0 +1,14 @@
+{
+  "collectionName": "components_ejercicio5_rich_texts",
+  "info": {
+    "displayName": "Rich text"
+  },
+  "options": {},
+  "attributes": {
+    "descripcion": {
+      "type": "blocks",
+      "required": true
+    }
+  },
+  "config": {}
+}

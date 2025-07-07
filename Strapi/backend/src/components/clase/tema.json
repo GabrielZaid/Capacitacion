@@ -1,0 +1,29 @@
+{
+  "collectionName": "components_clase_temas",
+  "info": {
+    "displayName": "tema"
+  },
+  "options": {},
+  "attributes": {
+    "nombre_tema": {
+      "type": "string",
+      "default": "N/R",
+      "minLength": 2,
+      "maxLength": 255,
+      "required": true
+    },
+    "descripcion": {
+      "type": "text",
+      "default": "N/R",
+      "minLength": 2,
+      "maxLength": 255,
+      "required": true
+    },
+    "subtema": {
+      "type": "component",
+      "component": "clase.subtema",
+      "repeatable": true
+    }
+  },
+  "config": {}
+}

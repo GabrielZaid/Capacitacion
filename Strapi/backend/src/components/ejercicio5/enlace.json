@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_ejercicio5_enlaces",
+  "info": {
+    "displayName": "Enlace",
+    "icon": "link"
+  },
+  "options": {},
+  "attributes": {
+    "titulo": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "required": true
+    },
+    "enlace": {
+      "type": "text",
+      "required": true,
+      "unique": true
+    }
+  },
+  "config": {}
+}

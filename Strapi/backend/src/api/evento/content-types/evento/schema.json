@@ -1,0 +1,55 @@
+{
+  "kind": "collectionType",
+  "collectionName": "eventos",
+  "info": {
+    "singularName": "evento",
+    "pluralName": "eventos",
+    "displayName": "Evento"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "default": "N/R",
+      "maxLength": 255,
+      "required": true,
+      "unique": true
+    },
+    "descripcion": {
+      "type": "string",
+      "maxLength": 255
+    },
+    "detalles": {
+      "type": "component",
+      "component": "evento.detalles-eventos",
+      "repeatable": false
+    },
+    "profesors": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::profesor.profesor",
+      "inversedBy": "eventos"
+    },
+    "tema": {
+      "type": "component",
+      "component": "clase.tema",
+      "repeatable": true
+    },
+    "material": {
+      "type": "component",
+      "component": "evento.material",
+      "repeatable": true
+    },
+    "zonaDinamica": {
+      "type": "dynamiczone",
+      "components": [
+        "ejercicio5.rich-text",
+        "ejercicio5.media",
+        "ejercicio5.enlace"
+      ]
+    }
+  }
+}

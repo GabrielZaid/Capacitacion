@@ -1,0 +1,35 @@
+{
+  "collectionName": "components_evento_materials",
+  "info": {
+    "displayName": "material"
+  },
+  "options": {},
+  "attributes": {
+    "tipo": {
+      "type": "enumeration",
+      "required": true,
+      "enum": [
+        "Video",
+        "Documento",
+        "Imagen",
+        "Enlace"
+      ]
+    },
+    "archivos": {
+      "type": "media",
+      "multiple": true,
+      "required": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "enlace": {
+      "type": "string",
+      "unique": false
+    }
+  },
+  "config": {}
+}

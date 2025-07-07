@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_ejercicio5_media",
+  "info": {
+    "displayName": "Media",
+    "icon": "attachment"
+  },
+  "options": {},
+  "attributes": {
+    "Media": {
+      "type": "media",
+      "multiple": true,
+      "required": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    }
+  },
+  "config": {}
+}

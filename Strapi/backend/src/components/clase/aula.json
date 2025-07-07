@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_clase_aulas",
+  "info": {
+    "displayName": "aula"
+  },
+  "options": {},
+  "attributes": {
+    "clave_aula": {
+      "type": "string",
+      "default": "N/R",
+      "minLength": 2,
+      "maxLength": 255,
+      "required": true,
+      "unique": true
+    },
+    "nombre_aula": {
+      "type": "string",
+      "default": "N/R",
+      "minLength": 2,
+      "maxLength": 255,
+      "required": true,
+      "unique": false
+    }
+  },
+  "config": {}
+}

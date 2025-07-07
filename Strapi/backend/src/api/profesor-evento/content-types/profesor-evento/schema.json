@@ -1,0 +1,15 @@
+{
+  "kind": "collectionType",
+  "collectionName": "profesor_eventos",
+  "info": {
+    "singularName": "profesor-evento",
+    "pluralName": "profesor-eventos",
+    "displayName": "Profesor Evento"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    
+  }
+}

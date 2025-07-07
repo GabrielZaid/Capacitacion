@@ -1,0 +1,41 @@
+{
+  "collectionName": "components_clase_detalles_clases",
+  "info": {
+    "displayName": "detalles_clase"
+  },
+  "options": {},
+  "attributes": {
+    "dias": {
+      "type": "enumeration",
+      "required": true,
+      "enum": [
+        "Domingo",
+        "Lunes",
+        "Martes",
+        "Miércoles",
+        "Jueves",
+        "Viernes",
+        "Sábado"
+      ]
+    },
+    "hora_inicio": {
+      "type": "time",
+      "required": true
+    },
+    "hora_final": {
+      "type": "time",
+      "required": true
+    },
+    "puntos_totales": {
+      "type": "biginteger",
+      "required": true,
+      "default": "999999999999999"
+    },
+    "aula": {
+      "type": "component",
+      "component": "clase.aula",
+      "repeatable": true
+    }
+  },
+  "config": {}
+}

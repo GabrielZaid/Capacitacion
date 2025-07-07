@@ -1,0 +1,29 @@
+{
+  "collectionName": "components_evento_detalles_eventos",
+  "info": {
+    "displayName": "detalles_eventos"
+  },
+  "options": {},
+  "attributes": {
+    "fecha": {
+      "type": "date",
+      "required": true
+    },
+    "hora_inicio": {
+      "type": "time",
+      "required": true
+    },
+    "hora_final": {
+      "type": "time",
+      "required": true
+    },
+    "lugar": {
+      "type": "string",
+      "default": "N/R",
+      "minLength": 2,
+      "maxLength": 255,
+      "required": true
+    }
+  },
+  "config": {}
+}
