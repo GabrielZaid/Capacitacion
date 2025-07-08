@@ -15,9 +15,7 @@ export interface DetallesAlergeno extends Struct.ComponentSchema {
       }>;
     Media: Schema.Attribute.Media<'images' | 'files'> &
       Schema.Attribute.Required;
-    Nombre: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.Unique;
+    Nombre: Schema.Attribute.String & Schema.Attribute.Required;
   };
 }
 
