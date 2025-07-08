@@ -393,6 +393,7 @@ export interface ApiMenuDiarioMenuDiario extends Struct.CollectionTypeSchema {
         maxLength: 150;
         minLength: 2;
       }>;
+    IVA: Schema.Attribute.Decimal;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',

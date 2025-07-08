@@ -51,6 +51,9 @@
         "Merienda",
         "Cena"
       ]
+    },
+    "IVA": {
+      "type": "decimal"
     }
   }
 }
