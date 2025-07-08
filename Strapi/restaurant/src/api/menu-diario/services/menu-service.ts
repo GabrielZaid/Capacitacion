@@ -3,13 +3,13 @@
 import { factories } from '@strapi/strapi';
 import { errors } from '@strapi/utils';
 
-type TipoMenu = 'Desayuno' | 'Almuerzo' | 'Comida' | 'Merienda' | 'Cena';
+type TipoMenuEnum = 'Desayuno' | 'Almuerzo' | 'Comida' | 'Merienda' | 'Cena';
 
 interface CalcularTotalParams {
   primeroId?: number | string;
   segundoId?: number | string;
   postreId?: number | string;
-  tipoMenu: TipoMenu;
+  tipoMenu: TipoMenuEnum;
 }
 
 interface CalculoTotal {
@@ -26,6 +26,13 @@ interface Plato {
   Tipo?: string;
 }
 
+interface TipoMenu {
+  id: string | number;
+  documentId: string;
+  Tipo?: string;
+  Precio_IVA?: number;
+}
+
 interface MenuDiario {
   id: string | number;
   documentId: string;
@@ -35,7 +42,8 @@ interface MenuDiario {
   Postre?: any;
   Precio?: number;
   Sum_Precio?: number;
-  TipoMenu?: TipoMenu;
+  IVA?: number;
+  tipo_menus?: TipoMenu[];
 }
 
 export default factories.createCoreService('api::menu-diario.menu-diario', ({ strapi }) => ({
@@ -124,7 +132,8 @@ export default factories.createCoreService('api::menu-diario.menu-diario', ({ st
         populate: {
           Primero: true,
           Segundo: true,
-          Postre: true
+          Postre: true,
+          tipo_menus: true
         }
       });
       
@@ -134,6 +143,78 @@ export default factories.createCoreService('api::menu-diario.menu-diario', ({ st
       console.error("Error al obtener menú diario actual:", error);
       return null;
     }
+  },
+
+  // ===== FUNCIONES DE CÁLCULO DE IMPUESTOS =====
+  
+  async obtenerTiposMenu(menuActual: MenuDiario | null, data: any): Promise<TipoMenu[]> {
+    try {
+      // Obtener tipos de menú del menú actual si existe
+      const tiposExistentes = menuActual?.tipo_menus || [];
+      
+      // Obtener tipos de menú de los datos que se están actualizando
+      let tiposNuevos: TipoMenu[] = [];
+      
+      if (data.tipo_menus) {
+        // Si se están actualizando los tipos de menú
+        if (Array.isArray(data.tipo_menus)) {
+          // Si es un array de IDs
+          const tiposIds = data.tipo_menus.map((tipo: any) => 
+            typeof tipo === 'object' ? tipo.id : tipo
+          ).filter(Boolean);
+          
+          if (tiposIds.length > 0) {
+            tiposNuevos = await strapi.entityService.findMany('api::tipo-menu.tipo-menu', {
+              filters: { id: { $in: tiposIds } }
+            });
+          }
+        } else if (typeof data.tipo_menus === 'object' && data.tipo_menus.connect) {
+          // Si es un objeto connect
+          const tiposIds = Array.isArray(data.tipo_menus.connect) 
+            ? data.tipo_menus.connect.map((t: any) => t.id)
+            : [data.tipo_menus.connect.id];
+          
+          if (tiposIds.length > 0) {
+            tiposNuevos = await strapi.entityService.findMany('api::tipo-menu.tipo-menu', {
+              filters: { id: { $in: tiposIds } }
+            });
+          }
+        }
+      }
+      
+      // Combinar tipos existentes y nuevos, eliminando duplicados
+      const todosLosTipos = [...tiposExistentes, ...tiposNuevos];
+      const tiposUnicos = todosLosTipos.filter((tipo, index, self) => 
+        self.findIndex(t => t.id === tipo.id) === index
+      );
+      
+      // console.log("Tipos de menú encontrados:", tiposUnicos);
+      return tiposUnicos;
+    } catch (error) {
+      console.error("Error al obtener tipos de menú:", error);
+      return [];
+    }
+  },
+
+  calcularPromedioIVA(tiposMenu: TipoMenu[]): number {
+    if (!tiposMenu || tiposMenu.length === 0) {
+      // console.log("No hay tipos de menú, usando IVA por defecto: 16%");
+      return 0.16; // IVA por defecto
+    }
+    
+    const ivas = tiposMenu
+      .map(tipo => Number(tipo.Precio_IVA) || 0)
+      .filter(iva => iva > 0);
+    
+    if (ivas.length === 0) {
+      // console.log("No hay IVAs válidos, usando por defecto: 16%");
+      return 0.16;
+    }
+    
+    const promedioIVA = ivas.reduce((sum, iva) => sum + iva, 0) / ivas.length;
+    // console.log(`Promedio de IVA calculado: ${(promedioIVA * 100).toFixed(2)}%`);
+    
+    return promedioIVA;
   },
 
   // ===== FUNCIONES DE CÁLCULO =====
@@ -213,7 +294,7 @@ export default factories.createCoreService('api::menu-diario.menu-diario', ({ st
     };
   },
 
-  async procesarCreacionMenu(data: any): Promise<number> {
+  async procesarCreacionMenu(data: any): Promise<{ subtotal: number; impuesto: number; total: number }> {
     const primeroId = this.extraerIdDeRelacion(data.Primero);
     const segundoId = this.extraerIdDeRelacion(data.Segundo);
     const postreId = this.extraerIdDeRelacion(data.Postre);
@@ -221,18 +302,30 @@ export default factories.createCoreService('api::menu-diario.menu-diario', ({ st
     // console.log("IDs extraídos:", { primeroId, segundoId, postreId });
 
     this.validarPlatosUnicos(primeroId, segundoId, postreId);
-    const sumaTotal = await this.calcularSumaTotal(primeroId, segundoId, postreId);
+    const subtotal = await this.calcularSumaTotal(primeroId, segundoId, postreId);
     
-    return sumaTotal;
+    // Obtener tipos de menú y calcular IVA
+    const tiposMenu = await this.obtenerTiposMenu(null, data);
+    const tasaIVA = this.calcularPromedioIVA(tiposMenu);
+    const impuesto = subtotal * tasaIVA;
+    const total = subtotal + impuesto;
+    
+    return { subtotal, impuesto, total };
   },
 
-  async procesarActualizacionMenu(data: any): Promise<number> {
+  async procesarActualizacionMenu(data: any): Promise<{ subtotal: number; impuesto: number; total: number }> {
     const menuActual = await this.obtenerMenuDiarioActual(data.documentId);
     const { primeroId, segundoId, postreId } = this.obtenerIdsParaCalculo(data, menuActual);
 
     this.validarPlatosUnicos(primeroId, segundoId, postreId);
-    const sumaTotal = await this.calcularSumaTotal(primeroId, segundoId, postreId);
+    const subtotal = await this.calcularSumaTotal(primeroId, segundoId, postreId);
     
-    return sumaTotal;
+    // Obtener tipos de menú y calcular IVA
+    const tiposMenu = await this.obtenerTiposMenu(menuActual, data);
+    const tasaIVA = this.calcularPromedioIVA(tiposMenu);
+    const impuesto = subtotal * tasaIVA;
+    const total = subtotal + impuesto;
+    
+    return { subtotal, impuesto, total };
   }
 })); 

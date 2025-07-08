@@ -4,12 +4,15 @@ export default {
     const data = event.params.data;
     // console.log("Data original:", JSON.stringify(data, null, 2));
     
-  
     const menuService = strapi.service('api::menu-diario.menu-service');
-    const sumaTotal = await menuService.procesarCreacionMenu(data);
-
+    const { subtotal, impuesto, total } = await menuService.procesarCreacionMenu(data);
     
-    data.Sum_Precio = sumaTotal;
+    // Guardar valores calculados
+    data.Precio = subtotal;        // Total sin impuestos
+    data.Sum_Precio = total;       // Total con impuestos
+    data.IVA = impuesto;           // Monto del impuesto
+    
+    // console.log("Cálculos:", { subtotal, impuesto, total });
     // console.log("Data final:", JSON.stringify(data, null, 2));
     // console.log("=== beforeCreate terminado ===");
   },
@@ -20,9 +23,14 @@ export default {
     // console.log("Data original:", JSON.stringify(data, null, 2));
     
     const menuService = strapi.service('api::menu-diario.menu-service');
-    const sumaTotal = await menuService.procesarActualizacionMenu(data); 
+    const { subtotal, impuesto, total } = await menuService.procesarActualizacionMenu(data);
     
-    data.Sum_Precio = sumaTotal;
+    // Guardar valores calculados
+    data.Precio = subtotal;        // Total sin impuestos
+    data.Sum_Precio = total;       // Total con impuestos
+    data.IVA = impuesto;           // Monto del impuesto
+    
+    // console.log("Cálculos:", { subtotal, impuesto, total });
     // console.log("Data final:", JSON.stringify(data, null, 2));
     // console.log("=== beforeUpdate terminado ===");
   },

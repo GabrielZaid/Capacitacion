@@ -41,19 +41,14 @@
       "type": "decimal",
       "default": 0
     },
-    "TipoMenu": {
-      "type": "enumeration",
-      "required": true,
-      "enum": [
-        "Desayuno",
-        "Almuerzo",
-        "Comida",
-        "Merienda",
-        "Cena"
-      ]
-    },
     "IVA": {
       "type": "decimal"
+    },
+    "tipo_menus": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::tipo-menu.tipo-menu",
+      "inversedBy": "menu_diarios"
     }
   }
 }

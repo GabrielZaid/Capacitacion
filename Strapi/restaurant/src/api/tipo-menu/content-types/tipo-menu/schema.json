@@ -1,0 +1,35 @@
+{
+  "kind": "collectionType",
+  "collectionName": "tipo_menus",
+  "info": {
+    "singularName": "tipo-menu",
+    "pluralName": "tipo-menus",
+    "displayName": "TipoMenu"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Tipo": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 255,
+      "required": true,
+      "unique": true
+    },
+    "Precio_IVA": {
+      "type": "decimal",
+      "required": true,
+      "default": 0.16,
+      "min": 0.05,
+      "max": 255
+    },
+    "menu_diarios": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::menu-diario.menu-diario",
+      "mappedBy": "tipo_menus"
+    }
+  }
+}

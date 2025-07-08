@@ -408,10 +408,10 @@ export interface ApiMenuDiarioMenuDiario extends Struct.CollectionTypeSchema {
     publishedAt: Schema.Attribute.DateTime;
     Segundo: Schema.Attribute.Relation<'oneToOne', 'api::plato.plato'>;
     Sum_Precio: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<0>;
-    TipoMenu: Schema.Attribute.Enumeration<
-      ['Desayuno', 'Almuerzo', 'Comida', 'Merienda', 'Cena']
-    > &
-      Schema.Attribute.Required;
+    tipo_menus: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::tipo-menu.tipo-menu'
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -485,6 +485,54 @@ export interface ApiPlatoPlato extends Struct.CollectionTypeSchema {
         i18n: {
           localized: true;
         };
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiTipoMenuTipoMenu extends Struct.CollectionTypeSchema {
+  collectionName: 'tipo_menus';
+  info: {
+    displayName: 'TipoMenu';
+    pluralName: 'tipo-menus';
+    singularName: 'tipo-menu';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::tipo-menu.tipo-menu'
+    > &
+      Schema.Attribute.Private;
+    menu_diarios: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::menu-diario.menu-diario'
+    >;
+    Precio_IVA: Schema.Attribute.Decimal &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 255;
+          min: 0.05;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<0.16>;
+    publishedAt: Schema.Attribute.DateTime;
+    Tipo: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+        minLength: 2;
       }>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1003,6 +1051,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::menu-diario.menu-diario': ApiMenuDiarioMenuDiario;
       'api::plato.plato': ApiPlatoPlato;
+      'api::tipo-menu.tipo-menu': ApiTipoMenuTipoMenu;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;
