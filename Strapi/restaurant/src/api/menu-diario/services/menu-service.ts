@@ -3,48 +3,7 @@
 import { factories } from '@strapi/strapi';
 import { errors } from '@strapi/utils';
 
-type TipoMenuEnum = 'Desayuno' | 'Almuerzo' | 'Comida' | 'Merienda' | 'Cena';
-
-interface CalcularTotalParams {
-  primeroId?: number | string;
-  segundoId?: number | string;
-  postreId?: number | string;
-  tipoMenu: TipoMenuEnum;
-}
-
-interface CalculoTotal {
-  subtotal: number;
-  impuesto: number;
-  total: number;
-}
-
-interface Plato {
-  id: string | number;
-  documentId: string;
-  Nombre?: string;
-  Precio?: number;
-  Tipo?: string;
-}
-
-interface TipoMenu {
-  id: string | number;
-  documentId: string;
-  Tipo?: string;
-  Precio_IVA?: number;
-}
-
-interface MenuDiario {
-  id: string | number;
-  documentId: string;
-  dia?: string;
-  Primero?: any;
-  Segundo?: any;
-  Postre?: any;
-  Precio?: number;
-  Sum_Precio?: number;
-  IVA?: number;
-  tipo_menus?: TipoMenu[];
-}
+import { Plato, TipoMenu, MenuDiario, CalculoTotal, CalcularTotalParams } from '../../../../type/menu-diario';
 
 export default factories.createCoreService('api::menu-diario.menu-diario', ({ strapi }) => ({
   

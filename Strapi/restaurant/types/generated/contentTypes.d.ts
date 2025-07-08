@@ -474,6 +474,7 @@ export interface ApiPlatoPlato extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMax<
         {
           max: 255;
+          min: 0.1;
         },
         number
       > &
