@@ -3,13 +3,23 @@ GET http://localhost:1337/menus/postres
 Accept: application/json
 
 ### Filtrar menús por rango de precios
-GET http://localhost:1337/menus?min_precio=100&max_precio=185
+GET http://localhost:1337/menus?min_precio=184
 Accept: application/json
 
 ### Filtrar menús sin ciertos alérgenos (GET /menus?excluir_alergenos=gluten,lactosa).
-GET http://localhost:1337/menus/filtrar?excluir_alergenos=Pescado,Pimienta
+GET http://localhost:1337/menus/filtrar?excluir_alergenos=Gluten,lactosa
 Accept: application/json
 
 ### Obtener los platos más populares
 GET http://localhost:1337/platos/populares?min_apariciones=3
 Accept: application/json
+
+
+### Obtener un menu diario por id
+GET http://localhost:1337/api/menu-diarios?id=1
+Accept: application/json
+
+### Actualizar un menu diario por id
+PUT http://localhost:1337/api/menu-diarios
+Accept: application/json
+

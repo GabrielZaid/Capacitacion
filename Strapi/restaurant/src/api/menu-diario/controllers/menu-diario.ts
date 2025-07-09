@@ -1,69 +1,73 @@
-/**
- * menu-diario controller
- */
+import { factories } from '@strapi/strapi';
+import { 
+  ERROR_MESSAGES, 
+  SUCCESS_MESSAGES, 
+  API_ROUTES, 
+  FIELD_NAMES, 
+  QUERY_PARAMS 
+} from '../../../../constants/menu-diario/const';
 import { Context } from 'koa';
-import { factories } from '@strapi/strapi'
+import { SENSITIVE_FIELDS } from '../../../../constants/global';
 
-// ====== Funciones Auxiliares ======
+function sanitizeData<T>(data: T): T {
+  if (Array.isArray(data)) {
+    return data.map(sanitizeData) as T;
+  }
+  if (data && typeof data === 'object') {
+    const sanitized = { ...data };
+    SENSITIVE_FIELDS.forEach(field => {
+      if (field in sanitized) delete sanitized[field];
+    });
+    Object.keys(sanitized).forEach(key => {
+      if (typeof sanitized[key] === 'object') {
+        sanitized[key] = sanitizeData(sanitized[key]);
+      }
+    });
+    return sanitized as T;
+  }
+  return data as T;
+}
 
-/**
- * Extrae los postres de una lista de menús
- */
-function extraerPostres(menus: any[]): any[] {
+function extractDesserts(menus: any[]): any[] {
   return menus
-    .map(menu => menu?.Postre)
+    .map(menu => menu?.[FIELD_NAMES.DESSERT])
     .filter(Boolean);
 }
 
-/**
- * Construye el filtro de precios para la consulta
- */
-function construirFiltroPrecio(min?: string, max?: string): Record<string, any> {
-  const filtro: Record<string, any> = {};
-  if (min) filtro.Precio = { $gte: Number(min) };
-  if (max) filtro.Precio = { ...filtro.Precio, $lte: Number(max) };
-  return filtro;
+function buildPriceFilter(min?: string, max?: string): Record<string, any> {
+  const filter: Record<string, any> = {};
+  if (min) filter[FIELD_NAMES.PRICE] = { $gte: Number(min) };
+  if (max) filter[FIELD_NAMES.PRICE] = { ...filter[FIELD_NAMES.PRICE], $lte: Number(max) };
+  return filter;
 }
 
-/**
- * Construye el filtro de suma de precios para la consulta avanzada
- */
-function construirFiltroSumaPrecio(min?: string, max?: string): Record<string, any> {
-  const filtro: Record<string, any> = {};
-  if (min) filtro.Sum_Precio = { ...(filtro.Sum_Precio || {}), $gte: Number(min) };
-  if (max) filtro.Sum_Precio = { ...(filtro.Sum_Precio || {}), $lte: Number(max) };
-  return filtro;
+function buildSumPriceFilter(min?: string, max?: string): Record<string, any> {
+  const filter: Record<string, any> = {};
+  if (min) filter[FIELD_NAMES.TOTAL_PRICE] = { ...(filter[FIELD_NAMES.TOTAL_PRICE] || {}), $gte: Number(min) };
+  if (max) filter[FIELD_NAMES.TOTAL_PRICE] = { ...(filter[FIELD_NAMES.TOTAL_PRICE] || {}), $lte: Number(max) };
+  return filter;
 }
 
-/**
- * Filtra menús excluyendo los que tengan ciertos alérgenos
- */
-function excluirMenusPorAlergenos(menus: any[], alergenos: string[]): any[] {
-  const excluir = alergenos.map(a => a.trim().toLowerCase());
+function excludeMenusByAllergens(menus: any[], allergens: string[]): any[] {
+  const exclude = allergens.map(a => a.trim().toLowerCase());
   return menus.filter(menu => {
-    const platos = [menu.Primero, menu.Segundo, menu.Postre].filter(Boolean);
-    return !platos.some(plato =>
-      (plato.Alergeno || []).some((alergeno: any) =>
-        excluir.includes((alergeno.nombre || alergeno.Nombre || '').toLowerCase())
+    const plates = [menu[FIELD_NAMES.FIRST], menu[FIELD_NAMES.SECOND], menu[FIELD_NAMES.DESSERT]].filter(Boolean);
+    return !plates.some(plate =>
+      (plate[FIELD_NAMES.ALLERGEN] || []).some((allergen: any) =>
+        exclude.includes((allergen[FIELD_NAMES.ALLERGEN_NAME] || '').toLowerCase())
       )
     );
   });
 }
 
-// ====== Controlador Principal ======
-
 export default factories.createCoreController('api::menu-diario.menu-diario', ({ strapi }) => ({
 
-  // GET /menus/postres
-  async getPostres(ctx: Context) {
+  async getDesserts(ctx: Context) {
     try {
-      console.log("getPostres");
-      const menus = await strapi.entityService.findMany('api::menu-diario.menu-diario', {
-        populate: { Postre: true },
+      const menus = await strapi.documents(API_ROUTES.MENU_DIARIO).findMany({
+        populate: { [FIELD_NAMES.DESSERT]: true },
       });
-      ctx.body = extraerPostres(menus);
-      
-
+      ctx.body = sanitizeData(extractDesserts(menus));
     } catch (error: any) {
       ctx.status = error.status || 500;
       ctx.body = {
@@ -71,23 +75,22 @@ export default factories.createCoreController('api::menu-diario.menu-diario', ({
         error: {
           status: ctx.status,
           name: error.name || 'InternalServerError',
-          message: error.message || 'Error al obtener los postres',
+          message: error.message || ERROR_MESSAGES.MENU_NOT_FOUND,
           details: error.details || {},
         },
       };
     }
   },
 
-  // GET /menus?min_precio=10&max_precio=20
-  async getMenusByPrecio(ctx: Context) {
+  async getMenusByPrice(ctx: Context) {
     try {
-      const min_precio = ctx.query.min_precio as string | undefined;
-      const max_precio = ctx.query.max_precio as string | undefined;
-      const filters = construirFiltroPrecio(min_precio, max_precio);
-      const menus = await strapi.entityService.findMany('api::menu-diario.menu-diario', {
+      const min_price = ctx.query.min_precio as string | undefined;
+      const max_price = ctx.query.max_precio as string | undefined;
+      const filters = buildPriceFilter(min_price, max_price);
+      const menus = await strapi.documents(API_ROUTES.MENU_DIARIO).findMany({
         filters,
       });
-      ctx.body = menus;
+      ctx.body = sanitizeData(menus);
     } catch (error: any) {
       ctx.status = error.status || 500;
       ctx.body = {
@@ -95,34 +98,33 @@ export default factories.createCoreController('api::menu-diario.menu-diario', ({
         error: {
           status: ctx.status,
           name: error.name || 'InternalServerError',
-          message: error.message || 'Error al filtrar menús por precio',
+          message: error.message || 'Error filtering menus by price',
           details: error.details || {},
         },
       };
     }
   },
 
-  // GET /menus?min_precio=10&max_precio=20&excluir_alergenos=gluten,lactosa
-  async filtrarMenus(ctx: Context) {
+  async filterMenus(ctx: Context) {
     try {
-      const min_precio = ctx.query.min_precio as string | undefined;
-      const max_precio = ctx.query.max_precio as string | undefined;
-      const excluir_alergenos = ctx.query.excluir_alergenos as string | undefined;
-      const filters = construirFiltroSumaPrecio(min_precio, max_precio);
-      const menus = await strapi.documents('api::menu-diario.menu-diario').findMany({
+      const min_price = ctx.query.min_precio as string | undefined;
+      const max_price = ctx.query.max_precio as string | undefined;
+      const exclude_allergens = ctx.query.excluir_alergenos as string | undefined;
+      const filters = buildSumPriceFilter(min_price, max_price);
+      const menus = await strapi.documents(API_ROUTES.MENU_DIARIO).findMany({
         populate: {
-          Primero: { populate: { Alergeno: true } },
-          Segundo: { populate: { Alergeno: true } },
-          Postre: { populate: { Alergeno: true } },
+          [FIELD_NAMES.FIRST]: { populate: { [FIELD_NAMES.ALLERGEN]: true } },
+          [FIELD_NAMES.SECOND]: { populate: { [FIELD_NAMES.ALLERGEN]: true } },
+          [FIELD_NAMES.DESSERT]: { populate: { [FIELD_NAMES.ALLERGEN]: true } },
         },
         filters,
       });
-      let resultado = menus;
-      if (typeof excluir_alergenos === 'string') {
-        const alergenos = excluir_alergenos.split(',');
-        resultado = excluirMenusPorAlergenos(menus, alergenos);
+      let result = menus;
+      if (typeof exclude_allergens === 'string') {
+        const allergens = exclude_allergens.split(',');
+        result = excludeMenusByAllergens(menus, allergens);
       }
-      ctx.body = { menus: resultado };
+      ctx.body = { menus: sanitizeData(result) };
     } catch (error: any) {
       ctx.status = error.status || 500;
       ctx.body = {
@@ -130,53 +132,39 @@ export default factories.createCoreController('api::menu-diario.menu-diario', ({
         error: {
           status: ctx.status,
           name: error.name || 'InternalServerError',
-          message: error.message || 'Error al filtrar menús por alérgenos',
+          message: error.message || 'Error filtering menus by allergens',
           details: error.details || {},
         },
       };
     }
   },
 
-  /**
-   * GET /platos/populares
-   * Devuelve los platos más populares (más veces aparecen en los menús diarios) y cuántas veces aparece cada uno
-   */
-  async getPlatosPopulares(ctx: Context) {
+  async getPopularPlates(ctx: Context) {
     try {
-
-      const min_apariciones = ctx.query.min_apariciones as string | undefined;
-
-      // Obtener todos los menús diarios con los platos populados
-      const menus = await strapi.entityService.findMany('api::menu-diario.menu-diario', {
-        populate: { Primero: true, Segundo: true, Postre: true },
+      const min_appearances = ctx.query.min_apariciones as string | undefined;
+      const menus = await strapi.documents(API_ROUTES.MENU_DIARIO).findMany({
+        populate: { [FIELD_NAMES.FIRST]: true, [FIELD_NAMES.SECOND]: true, [FIELD_NAMES.DESSERT]: true },
       });
-
-      // Contar apariciones de cada plato
-      const contador: Record<string, { plato: any, apariciones: number }> = {};
+      const counter: Record<string, { plate: any, appearances: number }> = {};
       for (const menu of menus) {
-        ['Primero', 'Segundo', 'Postre'].forEach(tipo => {
-          const plato = (menu as any)[tipo];
-          if (plato && plato.id) {
-            const id = String(plato.id);
-            if (!contador[id]) {
-              contador[id] = { plato, apariciones: 1 };
+        [FIELD_NAMES.FIRST, FIELD_NAMES.SECOND, FIELD_NAMES.DESSERT].forEach(type => {
+          const plate = (menu as any)[type];
+          if (plate && plate.id) {
+            const id = String(plate.id);
+            if (!counter[id]) {
+              counter[id] = { plate, appearances: 1 };
             } else {
-              contador[id].apariciones += 1;
+              counter[id].appearances += 1;
             }
           }
         });
       }
-
-      // Convertir a array y ordenar por apariciones descendente
-      let populares = Object.values(contador)
-        .sort((a, b) => b.apariciones - a.apariciones);
-
-      if(min_apariciones){
-        populares = populares.filter(plato => plato.apariciones >= Number(min_apariciones));
+      let popular = Object.values(counter)
+        .sort((a, b) => b.appearances - a.appearances);
+      if(min_appearances){
+        popular = popular.filter(plate => plate.appearances >= Number(min_appearances));
       }
-      
-
-      ctx.body = populares;
+      ctx.body = sanitizeData(popular);
     } catch (error: any) {
       ctx.status = error.status || 500;
       ctx.body = {
@@ -184,12 +172,11 @@ export default factories.createCoreController('api::menu-diario.menu-diario', ({
         error: {
           status: ctx.status,
           name: error.name || 'InternalServerError',
-          message: error.message || 'Error al obtener los platos populares',
+          message: error.message || 'Error getting popular plates',
           details: error.details || {},
         },
       };
     }
   }
-
 
 }));

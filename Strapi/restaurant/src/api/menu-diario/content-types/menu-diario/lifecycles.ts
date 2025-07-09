@@ -1,37 +1,25 @@
+import { API_ROUTES, FIELD_NAMES } from '../../../../../constants/menu-diario/const';
+
 export default {
   async beforeCreate(event: any) {
-    // console.log("=== beforeCreate iniciado ===");
     const data = event.params.data;
-    // console.log("Data original:", JSON.stringify(data, null, 2));
-    
-    const menuService = strapi.service('api::menu-diario.menu-service');
-    const { subtotal, impuesto, total } = await menuService.procesarCreacionMenu(data);
-    
-    // Guardar valores calculados
-    data.Precio = subtotal;        // Total sin impuestos
-    data.Sum_Precio = total;       // Total con impuestos
-    data.IVA = impuesto;           // Monto del impuesto
-    
-    // console.log("Cálculos:", { subtotal, impuesto, total });
-    // console.log("Data final:", JSON.stringify(data, null, 2));
-    // console.log("=== beforeCreate terminado ===");
+    const menuService = strapi.service(API_ROUTES.MENU_SERVICE);
+    const { subtotal, impuesto, total } = await menuService.processMenuCreation(data);
+    data[FIELD_NAMES.PRICE] = subtotal;
+    data[FIELD_NAMES.TOTAL_PRICE] = total;
+    data[FIELD_NAMES.TAX] = impuesto;
   },
 
   async beforeUpdate(event: any) {
-    // console.log("=== beforeUpdate iniciado ===");
     const data = event.params.data;
-    // console.log("Data original:", JSON.stringify(data, null, 2));
+
+    const menuService = strapi.service(API_ROUTES.MENU_SERVICE);
+    const { subtotal, impuesto, total } = await menuService.processMenuUpdate(data);
+
     
-    const menuService = strapi.service('api::menu-diario.menu-service');
-    const { subtotal, impuesto, total } = await menuService.procesarActualizacionMenu(data);
-    
-    // Guardar valores calculados
-    data.Precio = subtotal;        // Total sin impuestos
-    data.Sum_Precio = total;       // Total con impuestos
-    data.IVA = impuesto;           // Monto del impuesto
-    
-    // console.log("Cálculos:", { subtotal, impuesto, total });
-    // console.log("Data final:", JSON.stringify(data, null, 2));
-    // console.log("=== beforeUpdate terminado ===");
+
+    data[FIELD_NAMES.PRICE] = subtotal;
+    data[FIELD_NAMES.TOTAL_PRICE] = total;
+    data[FIELD_NAMES.TAX] = impuesto;
   },
 };

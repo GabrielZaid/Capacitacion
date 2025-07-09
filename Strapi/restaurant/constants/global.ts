@@ -1,0 +1,1 @@
+export const SENSITIVE_FIELDS = ['documentId', 'createdAt', 'updatedAt', 'publishedAt'];

@@ -1,43 +1,43 @@
-export type TipoMenuEnum = 'Desayuno' | 'Almuerzo' | 'Comida' | 'Merienda' | 'Cena';
+export type MenuTypeEnum = 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack' | 'Supper';
 
-export interface CalcularTotalParams {
-    primeroId?: number | string;
-    segundoId?: number | string;
-    postreId?: number | string;
-    tipoMenu: TipoMenuEnum;
+export interface CalculateTotalParams {
+    firstId?: number | string;
+    secondId?: number | string;
+    dessertId?: number | string;
+    menuType: MenuTypeEnum;
   }
   
-  export interface CalculoTotal {
+  export interface TotalCalculation {
     subtotal: number;
-    impuesto: number;
+    tax: number;
     total: number;
   }
   
-  export interface Plato {
+  export interface Plate {
     id: string | number;
     documentId: string;
-    Nombre?: string;
-    Precio?: number;
-    Tipo?: string;
+    Name?: string;
+    Price?: number;
+    Type?: string;
   }
   
-  export interface TipoMenu {
+  export interface MenuType {
     id: string | number;
     documentId: string;
-    Tipo?: string;
-    Precio_IVA?: number;
+    Type?: string;
+    Tax_Rate?: number;
   }
   
-export interface MenuDiario {
+export interface DailyMenu {
     id: string | number;
     documentId: string;
-    dia?: string;
-    Primero?: any;
-    Segundo?: any;
-    Postre?: any;
-    Precio?: number;
-    Sum_Precio?: number;
-    IVA?: number;
-    tipo_menus?: TipoMenu[];
+    day?: string;
+    First?: any;
+    Second?: any;
+    Dessert?: any;
+    Price?: number;
+    Total_Price?: number;
+    Tax?: number;
+    menu_types?: MenuType[];
   }
   
